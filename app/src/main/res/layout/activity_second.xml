@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.example.xomanonpxo.android_app.SecondActivity"
-    android:paddingBottom="50dp">
+    android:background="@android:color/background_dark">
 
 
     <ImageView
@@ -15,5 +15,54 @@
         android:id="@+id/imageView"
         app:srcCompat="@android:color/background_dark"
         android:scaleType="fitXY" />
+
+    <HorizontalScrollView
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true">
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/luminosity"
+                android:id="@+id/luminosityButton" />
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/contrast"
+                android:id="@+id/contrastButton" />
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/histogram_eq"
+                android:id="@+id/histogramEqButton" />
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/filters"
+                android:id="@+id/filtersButton" />
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/convolution"
+                android:id="@+id/convolutionButton" />
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/reset"
+                android:id="@+id/resetButton" />
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/save_pic"
+                android:id="@+id/savePicButton" />
+        </LinearLayout
+            >
+    </HorizontalScrollView>
 
 </RelativeLayout>
