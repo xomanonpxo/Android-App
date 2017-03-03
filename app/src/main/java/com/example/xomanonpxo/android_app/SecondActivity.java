@@ -1,5 +1,7 @@
 package com.example.xomanonpxo.android_app;
 
+import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -18,9 +20,11 @@ import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -37,6 +41,7 @@ import uk.co.senab.photoview.PhotoView;
 import uk.co.senab.photoview.PhotoViewAttacher;
 
 import static android.R.attr.data;
+import static android.R.attr.seekBarStyle;
 
 public class SecondActivity extends AppCompatActivity {
 
@@ -139,21 +144,63 @@ public class SecondActivity extends AppCompatActivity {
         Button luminosityButton = (Button)findViewById(R.id.luminosityButton);
         luminosityButton.setOnClickListener(new View.OnClickListener(){
             public void onClick(View view) {
-                Toast.makeText(getApplicationContext(), "luminosity !", Toast.LENGTH_LONG).show();
+                final AlertDialog.Builder popDialog = new AlertDialog.Builder(SecondActivity.this);
+                final SeekBar seek = new SeekBar(SecondActivity.this);
+                seek.setMax(200);
+                seek.setProgress(100);
+                seek.setKeyProgressIncrement(10);
+
+                popDialog.setTitle("Please select the luminosity ");
+                popDialog.setView(seek);
+                seek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser){
+                        Filters.luminosity(bmpMod, progress-100);
+                    }
+
+                    @Override
+                    public void onStartTrackingTouch(SeekBar seekBar) {
+                    }
+
+                    @Override
+                    public void onStopTrackingTouch(SeekBar seekBar) {
+                    }
+                });
+                popDialog.show();
             }
         });
 
         Button contrastButton = (Button)findViewById(R.id.contrastButton);
         contrastButton.setOnClickListener(new View.OnClickListener(){
             public void onClick(View view) {
-                Toast.makeText(getApplicationContext(), "contrast !", Toast.LENGTH_LONG).show();
+                final AlertDialog.Builder popDialog = new AlertDialog.Builder(SecondActivity.this);
+                final SeekBar seek = new SeekBar(SecondActivity.this);
+                seek.setMax(200);
+                seek.setProgress(100);
+                seek.setKeyProgressIncrement(10);
+
+                popDialog.setTitle("Please select the contrast ");
+                popDialog.setView(seek);
+                seek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser){
+                        Filters.contrast(bmpMod, progress-100);
+                    }
+
+                    @Override
+                    public void onStartTrackingTouch(SeekBar seekBar) {
+                    }
+
+                    @Override
+                    public void onStopTrackingTouch(SeekBar seekBar) {
+                    }
+                });
+                popDialog.show();
             }
         });
 
         Button histogramEqButton = (Button)findViewById(R.id.histogramEqButton);
         histogramEqButton.setOnClickListener(new View.OnClickListener(){
             public void onClick(View view) {
-                Toast.makeText(getApplicationContext(), "historigram eq !", Toast.LENGTH_LONG).show();
+                Filters.histogramEqualization(bmpMod);
             }
         });
 
@@ -179,7 +226,6 @@ public class SecondActivity extends AppCompatActivity {
                                 public void onChooseColor(int position, int color) {
                                     Filters.selectHue(bmpMod, color);
                                 }
-
                                 @Override
                                 public void onCancel() {
                                 }
@@ -222,26 +268,60 @@ public class SecondActivity extends AppCompatActivity {
         Button convolution = (Button)findViewById(R.id.convolutionButton);
         convolution.setOnClickListener(new View.OnClickListener(){
             public void onClick(View view) {
-                Toast.makeText(getApplicationContext(), "convolution !", Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "convolution to be done !", Toast.LENGTH_SHORT).show();
             }
         });
 
         Button resetButton = (Button)findViewById(R.id.resetButton);
         resetButton.setOnClickListener(new View.OnClickListener(){
             public void onClick(View view) {
-                Toast.makeText(getApplicationContext(), "reset !", Toast.LENGTH_LONG).show();
+                bmpMod = bmp.copy(bmp.getConfig(), true);
+                imageView.setImageBitmap(bmpMod);
+                mAttacher.update();
             }
         });
 
         Button savePicButton = (Button)findViewById(R.id.savePicButton);
         savePicButton.setOnClickListener(new View.OnClickListener(){
             public void onClick(View view) {
-                Toast.makeText(getApplicationContext(), "save pic !", Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "open failed !", Toast.LENGTH_SHORT).show();
+                boolean stored = storeImage(bmpMod, "Test.png");
             }
         });
 
         imageView = (ImageView)findViewById(R.id.imageView);
         mAttacher = new PhotoViewAttacher(imageView);
+    }
+
+    private boolean storeImage(Bitmap imageData, String filename) {
+        //get path to external storage (SD card)
+        String iconsStoragePath = Environment.getExternalStorageDirectory() + "/Android-App/myImages/";
+        File sdIconStorageDir = new File(iconsStoragePath);
+
+        //create storage directories, if they don't exist
+        sdIconStorageDir.mkdirs();
+
+        try {
+            String filePath = sdIconStorageDir.toString() + filename;
+            FileOutputStream fileOutputStream = new FileOutputStream(filePath);
+
+            BufferedOutputStream bos = new BufferedOutputStream(fileOutputStream);
+
+            //choose another format if PNG doesn't suit you
+            imageData.compress(Bitmap.CompressFormat.PNG, 100, bos);
+
+            bos.flush();
+            bos.close();
+
+        } catch (FileNotFoundException e) {
+            Log.w("TAG", "Error saving image file: " + e.getMessage());
+            return false;
+        } catch (IOException e) {
+            Log.w("TAG", "Error saving image file: " + e.getMessage());
+            return false;
+        }
+
+        return true;
     }
 
 }

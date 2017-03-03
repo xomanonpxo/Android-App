@@ -16,9 +16,6 @@ import java.net.URI;
 
 public class MainActivity extends AppCompatActivity {
 
-    public static final int CAPTURE_IMAGE_FULLSIZE_ACTIVITY_REQUEST_CODE = 1777;
-    private static int RESULT_LOAD_IMG = 1;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
