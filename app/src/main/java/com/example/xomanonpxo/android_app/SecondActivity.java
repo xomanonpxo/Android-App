@@ -32,6 +32,7 @@ import java.io.OutputStream;
 import java.net.URI;
 import java.nio.channels.FileChannel;
 
+import petrov.kristiyan.colorpicker.ColorPicker;
 import uk.co.senab.photoview.PhotoView;
 import uk.co.senab.photoview.PhotoViewAttacher;
 
@@ -159,7 +160,7 @@ public class SecondActivity extends AppCompatActivity {
         Button filtersButton = (Button)findViewById(R.id.filtersButton);
         filtersButton.setOnClickListener(new View.OnClickListener(){
             public void onClick(View view) {
-                final CharSequence[] items = { "Grayscale", "Sepia", "Color tone selection", "Invert", "Anaglyph 3D"};
+                final CharSequence[] items = { "Grayscale", "Sepia", "Hue selection", "Invert", "Anaglyph 3D", "Colorize"};
                 AlertDialog.Builder builder = new AlertDialog.Builder(SecondActivity.this);
                 builder.setTitle("Select a filter");
                 builder.setItems(items, new DialogInterface.OnClickListener(){
@@ -170,14 +171,41 @@ public class SecondActivity extends AppCompatActivity {
                         else if(items[item].equals("Sepia")){
                             Filters.sepia(bmpMod);
                         }
-                        else if(items[item].equals("Color tone selection")){
-                            Toast.makeText(getApplicationContext(), "Color tone selection to be done!", Toast.LENGTH_SHORT).show();
+                        else if(items[item].equals("Hue selection")){
+                            ColorPicker colorPicker = new ColorPicker(SecondActivity.this);
+                            colorPicker.show();
+                            colorPicker.setOnChooseColorListener(new ColorPicker.OnChooseColorListener() {
+                                @Override
+                                public void onChooseColor(int position, int color) {
+                                    Filters.selectHue(bmpMod, color);
+                                }
+
+                                @Override
+                                public void onCancel() {
+
+                                }
+                            });
                         }
                         else if(items[item].equals("Invert")){
                             Filters.invert(bmpMod);
                         }
                         else if(items[item].equals("Anaglyph 3D")){
                             Filters.anaglyph(bmpMod);
+                        }
+                        else if(items[item].equals("Colorize")){
+                            ColorPicker colorPicker = new ColorPicker(SecondActivity.this);
+                            colorPicker.show();
+                            colorPicker.setOnChooseColorListener(new ColorPicker.OnChooseColorListener() {
+                                @Override
+                                public void onChooseColor(int position, int color) {
+                                    Filters.colorize(bmpMod, color);
+                                }
+
+                                @Override
+                                public void onCancel() {
+
+                                }
+                            });
                         }
                     }
                 });
@@ -211,3 +239,7 @@ public class SecondActivity extends AppCompatActivity {
     }
 
 }
+
+/*
+Toast.makeText(getApplicationContext(), "Color tone selection to be done!", Toast.LENGTH_SHORT).show();
+ */

@@ -2,6 +2,7 @@ package com.example.xomanonpxo.android_app;
 
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.util.Log;
 
 /**
  * Created by xomanonpxo on 02/03/17.
@@ -57,5 +58,38 @@ public class Filters {
 
             }
         }
+    }
+    protected static void colorize(Bitmap bmp, int color) {
+        int[] rgb = new int[bmp.getWidth() * bmp.getHeight()];
+        bmp.getPixels(rgb, 0, bmp.getWidth(), 0, 0, bmp.getWidth(), bmp.getHeight());
+        float[] hsv = new float[3];
+        float[] hsvColor = new float[3];
+        Color.RGBToHSV(Color.red(color), Color.green(color), Color.blue(color), hsvColor);
+        for(int i = 0; i < bmp.getWidth() * bmp.getHeight(); i++) {
+            Color.RGBToHSV(Color.red(rgb[i]), Color.green(rgb[i]), Color.blue(rgb[i]), hsv);
+            rgb[i] = Color.HSVToColor(Color.alpha(rgb[i]), new float[]{hsvColor[0], hsv[1], hsv[2]});
+        }
+        bmp.setPixels(rgb, 0, bmp.getWidth(), 0, 0, bmp.getWidth(), bmp.getHeight());
+    }
+
+    protected static void selectHue(Bitmap bmp, int color){
+        int distanceMax = 800;
+        for(int j = 0; j < bmp.getHeight(); ++j) {
+            for (int i = 0; i < bmp.getWidth(); ++i) {
+                int p = bmp.getPixel(i, j);
+                float[] hsvPix = new float[3];
+                Color.RGBToHSV(Color.red(p), Color.green(p), Color.blue(p), hsvPix);
+                float[] hsvRef = new float[3];
+                Color.colorToHSV(color, hsvRef);
+                if(distanceHue(hsvRef[0], hsvPix[0]) >= distanceMax){
+                    int m = (int) (0.3 * Color.red(p) + 0.59 * Color.green(p) + 0.11 * Color.blue(p));
+                    bmp.setPixel(i, j, Color.argb(Color.alpha(p), m, m, m));
+                }
+            }
+        }
+    }
+
+    private static double distanceHue(float h1, float h2){
+        return (h1-h2)*(h1-h2);
     }
 }
