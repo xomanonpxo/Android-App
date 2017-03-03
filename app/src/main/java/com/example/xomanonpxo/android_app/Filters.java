@@ -92,4 +92,34 @@ public class Filters {
     private static double distanceHue(float h1, float h2){
         return (h1-h2)*(h1-h2);
     }
+
+    protected static void redCanal(Bitmap bmp){
+        for(int j = 0; j < bmp.getHeight(); ++j) {
+            for (int i = 0; i < bmp.getWidth(); ++i) {
+                int p = bmp.getPixel(i, j);
+                int r = Color.red(p);
+                bmp.setPixel(i, j, Color.argb(Color.alpha(p), r, 0, 0));
+            }
+        }
+    }
+
+    protected static void greenCanal(Bitmap bmp){
+        for(int j = 0; j < bmp.getHeight(); ++j) {
+            for (int i = 0; i < bmp.getWidth(); ++i) {
+                int p = bmp.getPixel(i, j);
+                int g = Color.green(p);
+                bmp.setPixel(i, j, Color.argb(Color.alpha(p), 0, g, 0));
+            }
+        }
+    }
+
+    protected static void blueCanal(Bitmap bmp){
+        for(int j = 0; j < bmp.getHeight(); ++j) {
+            for (int i = 0; i < bmp.getWidth(); ++i) {
+                int p = bmp.getPixel(i, j);
+                int b = Color.blue(p);
+                bmp.setPixel(i, j, Color.argb(Color.alpha(p), 0, 0, b));
+            }
+        }
+    }
 }

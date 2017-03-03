@@ -160,7 +160,7 @@ public class SecondActivity extends AppCompatActivity {
         Button filtersButton = (Button)findViewById(R.id.filtersButton);
         filtersButton.setOnClickListener(new View.OnClickListener(){
             public void onClick(View view) {
-                final CharSequence[] items = { "Grayscale", "Sepia", "Hue selection", "Invert", "Anaglyph 3D", "Colorize"};
+                final CharSequence[] items = { "Grayscale", "Sepia", "Hue selection", "Invert", "Anaglyph 3D", "Colorize", "Red Canal", "Green Canal", "Blue Canal"};
                 AlertDialog.Builder builder = new AlertDialog.Builder(SecondActivity.this);
                 builder.setTitle("Select a filter");
                 builder.setItems(items, new DialogInterface.OnClickListener(){
@@ -182,7 +182,6 @@ public class SecondActivity extends AppCompatActivity {
 
                                 @Override
                                 public void onCancel() {
-
                                 }
                             });
                         }
@@ -200,12 +199,19 @@ public class SecondActivity extends AppCompatActivity {
                                 public void onChooseColor(int position, int color) {
                                     Filters.colorize(bmpMod, color);
                                 }
-
                                 @Override
                                 public void onCancel() {
-
                                 }
                             });
+                        }
+                        else if(items[item].equals("Red Canal")){
+                            Filters.redCanal(bmpMod);
+                        }
+                        else if(items[item].equals("Green Canal")){
+                            Filters.greenCanal(bmpMod);
+                        }
+                        else if(items[item].equals("Blue Canal")){
+                            Filters.blueCanal(bmpMod);
                         }
                     }
                 });
