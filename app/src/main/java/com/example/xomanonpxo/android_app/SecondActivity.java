@@ -55,9 +55,13 @@ public class SecondActivity extends AppCompatActivity {
     Bitmap bmp;
     Bitmap bmpMod;
 
+    String imagePath = Environment.getExternalStorageDirectory() + "/Android-Filters-App/" + File.separator + Long.toString(System.currentTimeMillis()) + ".png";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        createDir();
 
         selectImage();
 
@@ -81,12 +85,20 @@ public class SecondActivity extends AppCompatActivity {
         }
     }
 
+    public void createDir(){
+        File sdStorageDir = new File(Environment.getExternalStorageDirectory() + "/Android-Filters-App/");
+        sdStorageDir.mkdirs();
+    }
+
     //Start the camera
     private void cameraIntent(){
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        //File file = new File(Environment.getExternalStorageDirectory()+File.separator+"image.jpg");
-        //intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(file));
-        startActivityForResult(intent, REQUEST_CAMERA);
+        imagePath = Environment.getExternalStorageDirectory() + "/Android-Filters-App/" + File.separator + Long.toString(System.currentTimeMillis()) + ".png";
+        File file = new File(imagePath);
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(file));
+        if (intent.resolveActivity(getPackageManager()) != null) {
+            startActivityForResult(intent, REQUEST_CAMERA);
+        }
     }
 
     //Start the gallery
@@ -100,9 +112,11 @@ public class SecondActivity extends AppCompatActivity {
     //Given the request code, call a function processing the image picked in gallery or taken by the camera
     public void onActivityResult(int requestCode, int resultCode, Intent data){
         super.onActivityResult(requestCode, resultCode, data);
+
         if (resultCode == RESULT_OK){
             if (requestCode == REQUEST_CAMERA){
                 onCaptureImageResult(data);
+
             }
             else if (requestCode == SELECT_FILE){
                 onSelectFromGalleryResult(data);
@@ -117,7 +131,7 @@ public class SecondActivity extends AppCompatActivity {
 
     //Show image picked from the camera
     private void onCaptureImageResult(Intent data) {
-        bmp = (Bitmap) data.getExtras().get("data");
+        bmp = BitmapFactory.decodeFile(imagePath);
         bmpMod = bmp.copy(bmp.getConfig(), true);
         imageView.setImageBitmap(bmpMod);
         mAttacher.update();
@@ -284,8 +298,11 @@ public class SecondActivity extends AppCompatActivity {
         Button savePicButton = (Button)findViewById(R.id.savePicButton);
         savePicButton.setOnClickListener(new View.OnClickListener(){
             public void onClick(View view) {
-                Toast.makeText(getApplicationContext(), "open failed !", Toast.LENGTH_SHORT).show();
-                boolean stored = storeImage(bmpMod, "Test.png");
+                boolean stored = storeImage(bmpMod);
+                Intent i = getBaseContext().getPackageManager().getLaunchIntentForPackage(getBaseContext().getPackageName() );
+                i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(i);
+                Toast.makeText(getApplicationContext(), "Your pic has been saved !", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -293,34 +310,30 @@ public class SecondActivity extends AppCompatActivity {
         mAttacher = new PhotoViewAttacher(imageView);
     }
 
-    private boolean storeImage(Bitmap imageData, String filename) {
-        //get path to external storage (SD card)
-        String iconsStoragePath = Environment.getExternalStorageDirectory() + "/Android-App/myImages/";
-        File sdIconStorageDir = new File(iconsStoragePath);
+    private boolean storeImage(Bitmap imageData) {
+         try {
+             FileOutputStream fileOutputStream = new FileOutputStream(imagePath);
 
-        //create storage directories, if they don't exist
-        sdIconStorageDir.mkdirs();
+             BufferedOutputStream bos = new BufferedOutputStream(fileOutputStream);
 
-        try {
-            String filePath = sdIconStorageDir.toString() + filename;
-            FileOutputStream fileOutputStream = new FileOutputStream(filePath);
+             imageData.compress(Bitmap.CompressFormat.PNG, 100, bos);
 
-            BufferedOutputStream bos = new BufferedOutputStream(fileOutputStream);
+             bos.flush();
+             bos.close();
 
-            //choose another format if PNG doesn't suit you
-            imageData.compress(Bitmap.CompressFormat.PNG, 100, bos);
+             //Add in gallery
+             Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+             Uri contentUri = Uri.fromFile(new  File(imagePath));
+             mediaScanIntent.setData(contentUri);
+             this.sendBroadcast(mediaScanIntent);
 
-            bos.flush();
-            bos.close();
-
-        } catch (FileNotFoundException e) {
+         } catch (FileNotFoundException e) {
             Log.w("TAG", "Error saving image file: " + e.getMessage());
             return false;
         } catch (IOException e) {
             Log.w("TAG", "Error saving image file: " + e.getMessage());
             return false;
         }
-
         return true;
     }
 
@@ -329,3 +342,4 @@ public class SecondActivity extends AppCompatActivity {
 /*
 Toast.makeText(getApplicationContext(), "Color tone selection to be done!", Toast.LENGTH_SHORT).show();
  */
+//System.currentTimeMillis()
