@@ -275,22 +275,6 @@ public class Filters {
         return h;
     }
 
-    protected static int minHistogram(int[] tab) {
-        int i = 0;
-        while (tab[i] == 0 && i != 256) {
-            i++;
-        }
-        return i;
-    }
-
-    protected static int maxHistogram(int[] tab) {
-        int i = 255;
-        while (tab[i] == 0 && i != -1) {
-            i--;
-        }
-        return i;
-    }
-
     private static int[] histogramLUTRed(Bitmap bmp){
 
         int[] rhistogram = calculHistogramRed(bmp);
@@ -367,6 +351,29 @@ public class Filters {
         }
 
         return bLUT;
+    }
+
+    protected static void convolution(Bitmap bmp){
+        Bitmap bmpCopy = bmp.copy(bmp.getConfig(), true);
+        int[] kernel = new int[9];
+        for(int i = 1; i < bmpCopy.getHeight()-1; i++){
+            for(int j = 1; j < bmpCopy.getWidth()-1; j++){
+                kernel[0] = bmpCopy.getPixel(i-1, j-1);
+                kernel[1] = bmpCopy.getPixel(i-1, j);
+                kernel[2] = bmpCopy.getPixel(i-1, j+1);
+                kernel[3] = bmpCopy.getPixel(i, j-1);
+                kernel[4] = bmpCopy.getPixel(i,j);
+                kernel[5] = bmpCopy.getPixel(i, j+1);
+                kernel[6] = bmpCopy.getPixel(i+1, j-1);
+                kernel[7] = bmpCopy.getPixel(i+1, j);
+                kernel[8] = bmpCopy.getPixel(i+1, j+1);
+                bmp.setPixel(i, j, gauss(kernel));
+            }
+        }
+    }
+
+    protected static int gauss(int[] kernel){
+        return (1/16)*kernel[0]+(2/16)*kernel[1]+(1/16)*kernel[2]+(2/16)*kernel[3]+(4/16)*kernel[4]+(2/16)*kernel[5]+(1/16)*kernel[6]+(2/16)*kernel[7]+(1/16)*kernel[1];
     }
 
 }

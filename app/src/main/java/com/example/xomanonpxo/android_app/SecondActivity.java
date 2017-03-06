@@ -85,7 +85,7 @@ public class SecondActivity extends AppCompatActivity {
         }
     }
 
-    public void createDir(){
+    private void createDir(){
         File sdStorageDir = new File(Environment.getExternalStorageDirectory() + "/Android-Filters-App/");
         sdStorageDir.mkdirs();
     }
@@ -153,7 +153,7 @@ public class SecondActivity extends AppCompatActivity {
     }
 
     //Handle the display of the activity
-    public void display(){
+    private void display(){
 
         Button luminosityButton = (Button)findViewById(R.id.luminosityButton);
         luminosityButton.setOnClickListener(new View.OnClickListener(){
@@ -279,10 +279,11 @@ public class SecondActivity extends AppCompatActivity {
             }
         });
 
-        Button convolution = (Button)findViewById(R.id.convolutionButton);
+        final Button convolution = (Button)findViewById(R.id.convolutionButton);
         convolution.setOnClickListener(new View.OnClickListener(){
             public void onClick(View view) {
                 Toast.makeText(getApplicationContext(), "convolution to be done !", Toast.LENGTH_SHORT).show();
+                //Filters.convolution(bmpMod); -> plante
             }
         });
 
