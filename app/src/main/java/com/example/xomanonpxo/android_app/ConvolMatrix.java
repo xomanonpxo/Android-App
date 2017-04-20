@@ -11,80 +11,80 @@ import android.renderscript.Matrix4f;
 public class ConvolMatrix {
 
     //Données membres d'objets
-    public int Size;
-    public double[][] Matrix;
-    public double Factor = 0;
+    public int _size;
+    public double[][] _matrix;
+    public double _factor = 0;
 
     //Constructeurs
     public ConvolMatrix(double[][] matrix){
-        Size = matrix.length;
-        Matrix = new double[Size][Size];
-        for(int i = 0; i < Size; ++i)
-            for(int j = 0; j < Size; ++j) {
-                Matrix[i][j] = matrix[i][j];
-                Factor += matrix[i][j];
+        _size = matrix.length;
+        _matrix = new double[_size][_size];
+        for(int i = 0; i < _size; ++i)
+            for(int j = 0; j < _size; ++j) {
+                _matrix[i][j] = matrix[i][j];
+                _factor += matrix[i][j];
             }
     }
 
     public ConvolMatrix(double[][] matrix, double factor){
-        Size = matrix.length;
-        Matrix = new double[Size][Size];
-        for(int i = 0; i < Size; ++i)
-            for(int j = 0; j < Size; ++j)
-                Matrix[i][j] = matrix[i][j];
-        Factor = factor;
+        _size = matrix.length;
+        _matrix = new double[_size][_size];
+        for(int i = 0; i < _size; ++i)
+            for(int j = 0; j < _size; ++j)
+                _matrix[i][j] = matrix[i][j];
+        _factor = factor;
     }
 
     //Accesseurs
     public int getSize(){
-        return Size;
+        return _size;
     }
 
     public double getFactor(){
-        return Factor;
+        return _factor;
     }
 
     public void setFactor(double factor){
-        Factor = factor;
+        _factor = factor;
     }
 
     public double getMatrixElement(int x, int y){
-        return Matrix[x][y];
+        return _matrix[x][y];
     }
 
     public void setMatrixElement(int x, int y, double value){
-        Matrix[x][y] = value;
+        _matrix[x][y] = value;
     }
 
     //Méthodes de la forme canonique
     public ConvolMatrix clone(){
-        return new ConvolMatrix(Matrix, Factor);
+        return new ConvolMatrix(_matrix, _factor);
     }
 
     public String toString(){
         StringBuffer str = new StringBuffer("Matrix :\n");
-        for(int i = 0; i < Size; ++i){
-            for(int j = 0; j < Size; ++j){
-                str.append(Matrix[i][j]);
+        for(int i = 0; i < _size; ++i){
+            for(int j = 0; j < _size; ++j){
+                str.append(_matrix[i][j]);
                 str.append(" ");
             }
             str.append("\n");
         }
         str.append("Size : ");
-        str.append(Size);
+        str.append(_size);
         str.append("\nFactor : ");
-        str.append(Factor);
+        str.append(_factor);
         str.append("\n");
         return str.toString();
     }
 
 
     public boolean equals(ConvolMatrix matrix){
-        if(Size != matrix.Size || Factor != matrix.Factor)
+        if(_size != matrix._size || _factor != matrix._factor)
             return false;
-        for(int i = 0; i < Size; ++i)
-            for(int j = 0; j < Size; ++j)
-                if (Matrix[i][j] != matrix.Matrix[i][j])
+        for(int i = 0; i < _size; ++i)
+            for(int j = 0; j < _size; ++j)
+                if (_matrix[i][j] != matrix._matrix[i][j])
                     return false;
         return true;
     }
@@ -99,16 +99,16 @@ public class ConvolMatrix {
 
         int a, r, g, b;
         int sumR, sumG, sumB;
-        int pixels[][] = new int[matrix.Size][matrix.Size];
+        int pixels[][] = new int[matrix._size][matrix._size];
 
-        int opt = matrix.Size/2;
+        int opt = matrix._size/2;
 
         for(int y = opt; y < height - opt-1; ++y) {
             for (int x = opt; x < width - opt-1; ++x) {
 
                 // get pixel matrix
-                for (int i = 0; i < matrix.Size; ++i) {
-                    for (int j = 0; j < matrix.Size; ++j) {
+                for (int i = 0; i < matrix._size; ++i) {
+                    for (int j = 0; j < matrix._size; ++j) {
                         pixels[i][j] = bmpCopy.getPixel(x - 1 + i, y - 1 + j);
                     }
                 }
@@ -122,11 +122,11 @@ public class ConvolMatrix {
                 sumB = 0;
 
                 // get sum of RGB on matrix
-                for (int i = 0; i < matrix.Size; ++i) {
-                    for (int j = 0; j < matrix.Size; ++j) {
-                        sumR += (Color.red(pixels[i][j]) * matrix.Matrix[i][j]);
-                        sumG += (Color.green(pixels[i][j]) * matrix.Matrix[i][j]);
-                        sumB += (Color.blue(pixels[i][j]) * matrix.Matrix[i][j]);
+                for (int i = 0; i < matrix._size; ++i) {
+                    for (int j = 0; j < matrix._size; ++j) {
+                        sumR += (Color.red(pixels[i][j]) * matrix._matrix[i][j]);
+                        sumG += (Color.green(pixels[i][j]) * matrix._matrix[i][j]);
+                        sumB += (Color.blue(pixels[i][j]) * matrix._matrix[i][j]);
                     }
                 }
 
@@ -146,7 +146,7 @@ public class ConvolMatrix {
     }
 
     private static int calculValue(int sum, ConvolMatrix matrix){
-        int r = (int) (sum / matrix.Factor);
+        int r = (int) (sum / matrix._factor);
         if (r < 0) {
             r = 0;
         } else if (r > 255) {
@@ -200,38 +200,22 @@ public static void applyConvolution(Bitmap bmp, ConvolMatrix matrix){
                         } else {
                             jCalc = v;
                         }
-                        sumR += (Color.red(bmpCopy.getPixel(iCalc, jCalc)) * matrix.Matrix[uCalc][vCalc]);
-                        sumG += (Color.green(bmpCopy.getPixel(iCalc, jCalc)) * matrix.Matrix[uCalc][vCalc]);
-                        sumB += (Color.blue(bmpCopy.getPixel(iCalc, jCalc)) * matrix.Matrix[iCalc][vCalc]);
+                        sumR += (Color.red(bmpCopy.getPixel(iCalc, jCalc)) * matrix._matrix[uCalc][vCalc]);
+                        sumG += (Color.green(bmpCopy.getPixel(iCalc, jCalc)) * matrix._matrix[uCalc][vCalc]);
+                        sumB += (Color.blue(bmpCopy.getPixel(iCalc, jCalc)) * matrix._matrix[iCalc][vCalc]);
                         vCalc += 1;
                     }
                     uCalc += 1;
                 }
 
                 // get final Red
-                r = (int)(sumR / matrix.Factor);
-                if (r < 0) {
-                    r = 0;
-                } else if (r > 255) {
-                    r = 255;
-                }
+                r = calculValue(sumR, matrix);
 
                 // get final Green
-                g = (int)(sumG / matrix.Factor);
-                if(g < 0) {
-                    g = 0;
-                } else if(g > 255) {
-                    g = 255;
-                }
+                g = calculValue(sumG, matrix);
 
                 // get final Blue
-                b = (int)(sumB / matrix.Factor);
-                if(b < 0) {
-                    b = 0;
-                }
-                else if(b > 255) {
-                    b = 255;
-                }
+                b = calculValue(sumB, matrix);
 
                 // apply new pixel
                 bmp.setPixel(i, j, Color.argb(a, r, g, b));
