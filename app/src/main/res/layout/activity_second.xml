@@ -26,26 +26,17 @@
             android:orientation="horizontal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
+
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/luminosity"
-                android:id="@+id/luminosityButton" />
+                android:text="@string/adjust"
+                android:id="@+id/adjustButton" />
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/contrast"
-                android:id="@+id/contrastButton" />
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/histogram_eq"
-                android:id="@+id/histogramEqButton" />
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/filters"
-                android:id="@+id/filtersButton" />
+                android:text="@string/effects"
+                android:id="@+id/effectsButton" />
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

@@ -155,73 +155,49 @@ public class SecondActivity extends AppCompatActivity {
     //Handle the display of the activity
     private void display(){
 
-        Button luminosityButton = (Button)findViewById(R.id.luminosityButton);
-        luminosityButton.setOnClickListener(new View.OnClickListener(){
+        Button adjustButton = (Button)findViewById(R.id.adjustButton);
+        adjustButton.setOnClickListener(new View.OnClickListener(){
             public void onClick(View view) {
-                final AlertDialog.Builder popDialog = new AlertDialog.Builder(SecondActivity.this);
-                final SeekBar seek = new SeekBar(SecondActivity.this);
-                seek.setMax(200);
-                seek.setProgress(100);
-                seek.setKeyProgressIncrement(10);
-
-                popDialog.setTitle("Please select the luminosity ");
-                popDialog.setView(seek);
-                seek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser){
-                        Filters.luminosity(bmpMod, progress-100);
-                    }
-
-                    @Override
-                    public void onStartTrackingTouch(SeekBar seekBar) {
-                    }
-
-                    @Override
-                    public void onStopTrackingTouch(SeekBar seekBar) {
+                final CharSequence[] items = {"Luminosity", "Contrast", "Saturation", "Histogram Equalization", "Hue"};
+                AlertDialog.Builder builder = new AlertDialog.Builder(SecondActivity.this);
+                builder.setTitle("Select an adjustment");
+                builder.setItems(items, new DialogInterface.OnClickListener(){
+                    public void onClick(DialogInterface dialog, int item){
+                        if(items[item].equals("Luminosity")){
+                            Filters.adjust(bmpMod, 20, 1, 1);
+                        }
+                        else if(items[item].equals("Contrast")){
+                            Filters.adjust(bmpMod, 0, 1.5f, 1);
+                        }
+                        else if(items[item].equals("Saturation")){
+                            Filters.adjust(bmpMod, 0, 1, 1.5f);
+                        }
+                        else if(items[item].equals("Histogram Equalization")){
+                            Filters.histogramEqualization(bmpMod);
+                        }
+                        else if(items[item].equals("Hue")){
+                            ColorPicker colorPicker = new ColorPicker(SecondActivity.this);
+                            colorPicker.show();
+                            colorPicker.setOnChooseColorListener(new ColorPicker.OnChooseColorListener() {
+                                @Override
+                                public void onChooseColor(int position, int color) {
+                                    Filters.colorize(bmpMod, color);
+                                }
+                                @Override
+                                public void onCancel() {
+                                }
+                            });
+                        }
                     }
                 });
-                popDialog.show();
+                builder.show();
             }
         });
 
-        Button contrastButton = (Button)findViewById(R.id.contrastButton);
-        contrastButton.setOnClickListener(new View.OnClickListener(){
+        Button effectsButton = (Button)findViewById(R.id.effectsButton);
+        effectsButton.setOnClickListener(new View.OnClickListener(){
             public void onClick(View view) {
-                final AlertDialog.Builder popDialog = new AlertDialog.Builder(SecondActivity.this);
-                final SeekBar seek = new SeekBar(SecondActivity.this);
-                seek.setMax(200);
-                seek.setProgress(100);
-                seek.setKeyProgressIncrement(10);
-
-                popDialog.setTitle("Please select the contrast ");
-                popDialog.setView(seek);
-                seek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser){
-                        Filters.contrast(bmpMod, progress-100);
-                    }
-
-                    @Override
-                    public void onStartTrackingTouch(SeekBar seekBar) {
-                    }
-
-                    @Override
-                    public void onStopTrackingTouch(SeekBar seekBar) {
-                    }
-                });
-                popDialog.show();
-            }
-        });
-
-        Button histogramEqButton = (Button)findViewById(R.id.histogramEqButton);
-        histogramEqButton.setOnClickListener(new View.OnClickListener(){
-            public void onClick(View view) {
-                Filters.histogramEqualization(bmpMod);
-            }
-        });
-
-        Button filtersButton = (Button)findViewById(R.id.filtersButton);
-        filtersButton.setOnClickListener(new View.OnClickListener(){
-            public void onClick(View view) {
-                final CharSequence[] items = { "Grayscale", "Sepia", "Hue selection", "Invert", "Anaglyph 3D", "Colorize", "Red Canal", "Green Canal", "Blue Canal"};
+                final CharSequence[] items = {"Grayscale", "Sepia", "Hue selection", "Invert", "Anaglyph 3D", "Red Canal", "Green Canal", "Blue Canal"};
                 AlertDialog.Builder builder = new AlertDialog.Builder(SecondActivity.this);
                 builder.setTitle("Select a filter");
                 builder.setItems(items, new DialogInterface.OnClickListener(){
@@ -251,27 +227,14 @@ public class SecondActivity extends AppCompatActivity {
                         else if(items[item].equals("Anaglyph 3D")){
                             Filters.anaglyph(bmpMod);
                         }
-                        else if(items[item].equals("Colorize")){
-                            ColorPicker colorPicker = new ColorPicker(SecondActivity.this);
-                            colorPicker.show();
-                            colorPicker.setOnChooseColorListener(new ColorPicker.OnChooseColorListener() {
-                                @Override
-                                public void onChooseColor(int position, int color) {
-                                    Filters.colorize(bmpMod, color);
-                                }
-                                @Override
-                                public void onCancel() {
-                                }
-                            });
-                        }
                         else if(items[item].equals("Red Canal")){
-                            Filters.redCanal(bmpMod);
+                            Filters.canal(bmpMod, 1, 0, 0);
                         }
                         else if(items[item].equals("Green Canal")){
-                            Filters.greenCanal(bmpMod);
+                            Filters.canal(bmpMod, 0, 1, 0);
                         }
                         else if(items[item].equals("Blue Canal")){
-                            Filters.blueCanal(bmpMod);
+                            Filters.canal(bmpMod, 0, 0, 1);
                         }
                     }
                 });
@@ -282,8 +245,75 @@ public class SecondActivity extends AppCompatActivity {
         final Button convolution = (Button)findViewById(R.id.convolutionButton);
         convolution.setOnClickListener(new View.OnClickListener(){
             public void onClick(View view) {
-                Toast.makeText(getApplicationContext(), "convolution to be done !", Toast.LENGTH_SHORT).show();
-                //Filters.convolution(bmpMod); -> plante
+                final CharSequence[] items = {"Average", "Gaussian", "Sobel", "Laplacien"};
+                AlertDialog.Builder builder = new AlertDialog.Builder(SecondActivity.this);
+                builder.setTitle("Select a convolution");
+                builder.setItems(items, new DialogInterface.OnClickListener(){
+                    public void onClick(DialogInterface dialog, int item){
+                        if(items[item].equals("Average")){
+                            double AverageConfig[][] = new double[][] {
+                                    { 1, 1, 1, 1, 1 },
+                                    { 1, 1, 1, 1, 1 },
+                                    { 1, 1, 1, 1, 1 },
+                                    { 1, 1, 1, 1, 1 },
+                                    { 1, 1, 1, 1, 1 }
+                            };
+                            ConvolMatrix averageMatrix = new ConvolMatrix(AverageConfig);
+                            ConvolMatrix.applyConvolution(bmpMod, averageMatrix);
+                        }
+                        else if(items[item].equals("Gaussian")){
+                            double GaussianConfig[][] = new double[][] {
+                                    { 1, 2, 3, 2, 1 },
+                                    { 2, 6, 8, 6, 2 },
+                                    { 3, 8, 10, 8, 3 },
+                                    { 2, 6, 8, 6, 2 },
+                                    { 1, 2, 3, 2, 1 }
+                            };
+                            ConvolMatrix gaussMatrix = new ConvolMatrix(GaussianConfig);
+                            ConvolMatrix.applyConvolution(bmpMod, gaussMatrix);
+                        }
+                        else if(items[item].equals("Sobel")){
+                            Bitmap bmpCopy1 = bmp.copy(bmp.getConfig(), true);
+                            double sobelVerticalConfig[][] = new double[][] {
+                                    { 1, 2, 1 },
+                                    { 0, 0, 0 },
+                                    { -1, -2, -1 }
+                            };
+                            ConvolMatrix sobelVerticalMatrix = new ConvolMatrix(sobelVerticalConfig);
+                            ConvolMatrix.applyConvolution(bmpCopy1, sobelVerticalMatrix);
+                            Bitmap bmpCopy2 = bmp.copy(bmp.getConfig(), true);
+                            double sobelHorizontalConfig[][] = new double[][] {
+                                    { -1, 0, 1 },
+                                    { -2, 0, 2 },
+                                    { -1, 0, 1 }
+                            };
+                            ConvolMatrix sobelHorizontalMatrix = new ConvolMatrix(sobelHorizontalConfig);
+                            ConvolMatrix.applyConvolution(bmpCopy2, sobelHorizontalMatrix);
+                            int p1, p2;
+                            for(int i = 0; i < bmpMod.getWidth(); ++i){
+                                for(int j = 0; j < bmpMod.getHeight(); ++j){
+                                    p1 = bmpCopy1.getPixel(i, j);
+                                    p2 = bmpCopy2.getPixel(i, j);
+
+                                    bmpMod.setPixel(i, j, (int)Math.sqrt(p1*p1+p2*p2));
+                                }
+                            }
+                            Toast.makeText(getApplicationContext(), Double.toString(sobelHorizontalMatrix.getFactor()), Toast.LENGTH_SHORT).show();
+                        }
+                        else if(items[item].equals("Laplacien")) {
+                            double laplacienConfig[][] = new double[][] {
+                                    { 1, 1, 1 },
+                                    { 1, -8, 1 },
+                                    { 1, 1, 1 }
+                            };
+                            ConvolMatrix laplacienMatrix = new ConvolMatrix(laplacienConfig);
+                            ConvolMatrix.applyConvolution(bmpMod, laplacienMatrix);
+
+                            Toast.makeText(getApplicationContext(), "Laplacien to be done !", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+                builder.show();
             }
         });
 
@@ -344,3 +374,78 @@ public class SecondActivity extends AppCompatActivity {
 Toast.makeText(getApplicationContext(), "Color tone selection to be done!", Toast.LENGTH_SHORT).show();
  */
 //System.currentTimeMillis()
+
+/*
+luminosity
+
+                final AlertDialog.Builder popDialog = new AlertDialog.Builder(SecondActivity.this);
+                final SeekBar seek = new SeekBar(SecondActivity.this);
+                seek.setMax(200);
+                seek.setProgress(100);
+                seek.setKeyProgressIncrement(10);
+
+                popDialog.setTitle("Please select the luminosity ");
+                popDialog.setView(seek);
+                seek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser){
+                        Filters.luminosity(bmpMod, progress-100);
+                    }
+
+                    @Override
+                    public void onStartTrackingTouch(SeekBar seekBar) {
+                    }
+
+                    @Override
+                    public void onStopTrackingTouch(SeekBar seekBar) {
+                    }
+                });
+                popDialog.show();
+
+Filters.change(bmpMod, 20, 1, 1);
+ */
+
+/*
+        Button contrastButton = (Button)findViewById(R.id.contrastButton);
+        contrastButton.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View view) {
+                /*final AlertDialog.Builder popDialog = new AlertDialog.Builder(SecondActivity.this);
+                final SeekBar seek = new SeekBar(SecondActivity.this);
+                seek.setMax(200);
+                seek.setProgress(100);
+                seek.setKeyProgressIncrement(10);
+
+                popDialog.setTitle("Please select the contrast ");
+                popDialog.setView(seek);
+                seek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser){
+                        Filters.contrast(bmpMod, progress-100);
+                    }
+
+                    @Override
+                    public void onStartTrackingTouch(SeekBar seekBar) {
+                    }
+
+                    @Override
+                    public void onStopTrackingTouch(SeekBar seekBar) {
+                    }
+                });
+                popDialog.show();
+Filters.change(bmpMod, 0, 1.5f, 1);
+        }
+        });
+
+        Button saturationButton = (Button)findViewById(R.id.saturationButton);
+        saturationButton.setOnClickListener(new View.OnClickListener(){
+public void onClick(View view) {
+        Filters.change(bmpMod, 0, 1, 1.5f);
+        }
+        });
+
+        Button histogramEqButton = (Button)findViewById(R.id.histogramEqButton);
+        histogramEqButton.setOnClickListener(new View.OnClickListener(){
+public void onClick(View view) {
+        Filters.histogramEqualization(bmpMod);
+        }
+        });
+
+ */
