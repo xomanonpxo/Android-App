@@ -1,8 +1,11 @@
 package com.example.xomanonpxo.android_app;
 
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
-import android.util.Log;
+import android.graphics.ColorMatrix;
+import android.graphics.ColorMatrixColorFilter;
+import android.graphics.Paint;
 
 /**
  * Created by xomanonpxo on 02/03/17.
@@ -10,371 +13,263 @@ import android.util.Log;
 
 public class Filters {
 
-    protected static void grayscale(Bitmap bmp) {
-        int[] rgb = new int[bmp.getWidth() * bmp.getHeight()];
-        bmp.getPixels(rgb, 0, bmp.getWidth(), 0, 0, bmp.getWidth(), bmp.getHeight());
-        for (int i = 0; i < bmp.getWidth() * bmp.getHeight(); i++) {
-            int m = (int) (0.3 * Color.red(rgb[i]) + 0.59 * Color.green(rgb[i]) + 0.11 * Color.blue(rgb[i]));
-            rgb[i] = Color.argb(Color.alpha(rgb[i]), m, m, m);
-        }
-        bmp.setPixels(rgb, 0, bmp.getWidth(), 0, 0, bmp.getWidth(), bmp.getHeight());
+    private static int grayAverage(int color){
+        return (int) (0.3 * Color.red(color) + 0.59 * Color.green(color) + 0.11 * Color.blue(color));
     }
 
-    protected static void sepia(Bitmap bmp) {
-        int[] res = new int[bmp.getWidth() * bmp.getHeight()];
-        bmp.getPixels(res, 0, bmp.getWidth(), 0, 0, bmp.getWidth(), bmp.getHeight());
-        for (int j = 0; j < bmp.getWidth() * bmp.getHeight(); j++) {
-            int r = Color.red(res[j]);
-            int g = Color.green(res[j]);
-            int b = Color.blue(res[j]);
-            int rFinal = (int) Math.min(255, ((r * 0.393f) + (g *0.769f) + (b * 0.189f)));
-            int gFinal = (int) Math.min(255, ((r * 0.349f) + (g *0.686f) + (b * 0.168f)));
-            int bFinal = (int) Math.min(255, ((r * 0.272f) + (g * 0.534f) + (b *  0.131f)));
-            res[j] = Color.argb(Color.alpha(res[j]), rFinal, gFinal, bFinal);
-        }
-        bmp.setPixels(res, 0, bmp.getWidth(), 0, 0, bmp.getWidth(), bmp.getHeight());
-    }
-
-    protected static void invert(Bitmap bmp){
-        for(int j = 0; j < bmp.getHeight(); j++){
-            for(int i = 0; i < bmp.getWidth(); i++){
-                int p = bmp.getPixel(i, j);
-                bmp.setPixel(i, j, Color.argb(Color.alpha(p), 255 - Color.red(p), 255 - Color.green(p), Color.blue(p)));
-            }
-        }
-    }
-
-    protected static void anaglyph(Bitmap bmp){
-        Bitmap bmp2 = bmp.copy(Bitmap.Config.ARGB_8888, true);
-        bmp.eraseColor(Color.BLACK);
-        int shift = 8;
-
-        for(int j = shift; j < bmp.getHeight() -shift; ++j){
-            for(int i = shift; i < bmp.getWidth() - shift; ++i){
-                int p = bmp2.getPixel(i, j);
-                int pMin = bmp2.getPixel(i - shift, j);
-                int pMax = bmp2.getPixel(i + shift, j);
-                bmp.setPixel(i, j, Color.argb(Color.alpha(p), Color.red(pMin), Color.green(pMax), Color.blue(pMax)));
-
-            }
-        }
-    }
-    protected static void colorize(Bitmap bmp, int color) {
-        int[] rgb = new int[bmp.getWidth() * bmp.getHeight()];
-        bmp.getPixels(rgb, 0, bmp.getWidth(), 0, 0, bmp.getWidth(), bmp.getHeight());
-        float[] hsv = new float[3];
-        float[] hsvColor = new float[3];
-        Color.RGBToHSV(Color.red(color), Color.green(color), Color.blue(color), hsvColor);
-        for(int i = 0; i < bmp.getWidth() * bmp.getHeight(); i++) {
-            Color.RGBToHSV(Color.red(rgb[i]), Color.green(rgb[i]), Color.blue(rgb[i]), hsv);
-            rgb[i] = Color.HSVToColor(Color.alpha(rgb[i]), new float[]{hsvColor[0], hsv[1], hsv[2]});
-        }
-        bmp.setPixels(rgb, 0, bmp.getWidth(), 0, 0, bmp.getWidth(), bmp.getHeight());
-    }
-
-    protected static void selectHue(Bitmap bmp, int color){
-        int distanceMax = 800;
-        for(int j = 0; j < bmp.getHeight(); ++j) {
-            for (int i = 0; i < bmp.getWidth(); ++i) {
-                int p = bmp.getPixel(i, j);
-                float[] hsvPix = new float[3];
-                Color.RGBToHSV(Color.red(p), Color.green(p), Color.blue(p), hsvPix);
-                float[] hsvRef = new float[3];
-                Color.colorToHSV(color, hsvRef);
-                if(distanceHue(hsvRef[0], hsvPix[0]) >= distanceMax){
-                    int m = (int) (0.3 * Color.red(p) + 0.59 * Color.green(p) + 0.11 * Color.blue(p));
-                    bmp.setPixel(i, j, Color.argb(Color.alpha(p), m, m, m));
-                }
-            }
-        }
-    }
-
-    private static double distanceHue(float h1, float h2){
+    private static double distance(float h1, float h2){
         return (h1-h2)*(h1-h2);
     }
 
-    protected static void redCanal(Bitmap bmp){
-        for(int j = 0; j < bmp.getHeight(); ++j) {
-            for (int i = 0; i < bmp.getWidth(); ++i) {
-                int p = bmp.getPixel(i, j);
-                int r = Color.red(p);
-                bmp.setPixel(i, j, Color.argb(Color.alpha(p), r, 0, 0));
+    protected static void grayscale(Bitmap bmp) {
+        int pixels[] = new int[bmp.getWidth() * bmp.getHeight()], m;
+        bmp.getPixels(pixels, 0, bmp.getWidth(), 0, 0, bmp.getWidth(), bmp.getHeight());
+
+        for (int i = 0; i < bmp.getWidth() * bmp.getHeight(); i++) {
+            m = grayAverage(pixels[i]);
+            pixels[i] = Color.argb(Color.alpha(pixels[i]), m, m, m);
+        }
+
+        bmp.setPixels(pixels, 0, bmp.getWidth(), 0, 0, bmp.getWidth(), bmp.getHeight());
+    }
+
+    protected static void sepia(Bitmap bmp) {
+        int pixels[] = new int[bmp.getWidth() * bmp.getHeight()], r, g, b, rFinal, gFinal, bFinal;
+        bmp.getPixels(pixels, 0, bmp.getWidth(), 0, 0, bmp.getWidth(), bmp.getHeight());
+
+        for (int i = 0; i < bmp.getWidth() * bmp.getHeight(); i++) {
+            r = Color.red(pixels[i]);
+            g = Color.green(pixels[i]);
+            b = Color.blue(pixels[i]);
+            rFinal = (int) Math.min(255, ((r * 0.393f) + (g *0.769f) + (b * 0.189f)));
+            gFinal = (int) Math.min(255, ((r * 0.349f) + (g *0.686f) + (b * 0.168f)));
+            bFinal = (int) Math.min(255, ((r * 0.272f) + (g * 0.534f) + (b *  0.131f)));
+            pixels[i] = Color.argb(Color.alpha(pixels[i]), rFinal, gFinal, bFinal);
+        }
+
+        bmp.setPixels(pixels, 0, bmp.getWidth(), 0, 0, bmp.getWidth(), bmp.getHeight());
+    }
+
+    protected static void invert(Bitmap bmp){
+        int pixels[] = new int[bmp.getWidth() * bmp.getHeight()];
+        bmp.getPixels(pixels, 0, bmp.getWidth(), 0, 0, bmp.getWidth(), bmp.getHeight());
+
+        for(int i = 0; i < bmp.getWidth() * bmp.getHeight(); i++){
+            pixels[i] = Color.argb(Color.alpha(pixels[i]), 255 - Color.red(pixels[i]), 255 - Color.green(pixels[i]), 255 - Color.blue(pixels[i]));
+        }
+
+        bmp.setPixels(pixels, 0, bmp.getWidth(), 0, 0, bmp.getWidth(), bmp.getHeight());
+    }
+
+    protected static void anaglyph(Bitmap bmp){
+        Bitmap bmpCopy = bmp.copy(Bitmap.Config.ARGB_8888, true);
+        bmp.eraseColor(Color.BLACK);
+
+        int shift = 8, i, j, p, pMin, pMax;
+
+        for(j = shift; j < bmp.getHeight() -shift; ++j){
+            for(i = shift; i < bmp.getWidth() - shift; ++i){
+                p = bmpCopy.getPixel(i, j);
+                pMin = bmpCopy.getPixel(i - shift, j);
+                pMax = bmpCopy.getPixel(i + shift, j);
+                bmp.setPixel(i, j, Color.argb(Color.alpha(p), Color.red(pMin), Color.green(pMax), Color.blue(pMax)));
             }
         }
     }
 
-    protected static void greenCanal(Bitmap bmp){
-        for(int j = 0; j < bmp.getHeight(); ++j) {
-            for (int i = 0; i < bmp.getWidth(); ++i) {
-                int p = bmp.getPixel(i, j);
-                int g = Color.green(p);
-                bmp.setPixel(i, j, Color.argb(Color.alpha(p), 0, g, 0));
-            }
+    protected static void colorize(Bitmap bmp, int color) {
+        int pixels[] = new int[bmp.getWidth() * bmp.getHeight()];
+        bmp.getPixels(pixels, 0, bmp.getWidth(), 0, 0, bmp.getWidth(), bmp.getHeight());
+
+        float[] hsv = new float[3], hsvColor = new float[3];
+        Color.RGBToHSV(Color.red(color), Color.green(color), Color.blue(color), hsvColor);
+
+        for(int i = 0; i < bmp.getWidth() * bmp.getHeight(); i++) {
+            Color.RGBToHSV(Color.red(pixels[i]), Color.green(pixels[i]), Color.blue(pixels[i]), hsv);
+            pixels[i] = Color.HSVToColor(Color.alpha(pixels[i]), new float[]{hsvColor[0], hsv[1], hsv[2]});
         }
+
+        bmp.setPixels(pixels, 0, bmp.getWidth(), 0, 0, bmp.getWidth(), bmp.getHeight());
     }
 
-    protected static void blueCanal(Bitmap bmp){
-        for(int j = 0; j < bmp.getHeight(); ++j) {
-            for (int i = 0; i < bmp.getWidth(); ++i) {
-                int p = bmp.getPixel(i, j);
-                int b = Color.blue(p);
-                bmp.setPixel(i, j, Color.argb(Color.alpha(p), 0, 0, b));
-            }
-        }
+    /**
+     * same function, but with ColorMatrix
+     */
+
+    public static void colorizeColorMatrix(Bitmap bmp, int color){
+        float hsv[] = new float[3];
+        Color.RGBToHSV(Color.red(color), Color.green(color), Color.blue(color), hsv);
+
+        float sum = Color.red(color) + Color.green(color) + Color.blue(color);
+        float pr = Color.red(color)/sum;
+        float pg = Color.green(color)/sum;
+        float pb = Color.blue(color)/sum;
+        float adjust = (1-pr)+(1-pg)+(1-pb);
+
+        ColorMatrix cm = new ColorMatrix(new float[]
+                {
+                        pr+pr*adjust, 0, 0, 0, 20,
+                        0, pg+pg*adjust, 0, 0, 20,
+                        0, 0, pb+pb*adjust, 0, 20,
+                        0, 0, 0, 1, 0,
+                });
+
+        Canvas canvas = new Canvas(bmp);
+        Paint paint = new Paint();
+        paint.setColorFilter(new ColorMatrixColorFilter(cm));
+        canvas.drawBitmap(bmp, 0, 0, paint);
     }
 
-    protected static void luminosity(Bitmap bmp, int value){
-        int a, r, g, b;
-        int pixel;
+    protected static void selectHue(Bitmap bmp, int color){
+        int pixels[] = new int[bmp.getWidth() * bmp.getHeight()], distanceMax = 800, m;
+        bmp.getPixels(pixels, 0, bmp.getWidth(), 0, 0, bmp.getWidth(), bmp.getHeight());
 
-        for (int x = 0; x < bmp.getWidth(); ++x){
-            for (int y = 0; y < bmp.getHeight(); ++y){
+        float hsvPix[] = new float[3], hsvRef[] = new float[3];
 
-                pixel = bmp.getPixel(x, y);
-                a = Color.alpha(pixel);
-                r = Color.red(pixel);
-                g = Color.green(pixel);
-                b = Color.blue(pixel);
-
-                // increase/decrease each channel
-                r += value;
-                if (r > 255)
-                    r = 255;
-                else if (r < 0)
-                    r = 0;
-
-                g += value;
-                if (g > 255)
-                    g = 255;
-                else if (g < 0)
-                    g = 0;
-
-                b += value;
-                if (b > 255)
-                    b = 255;
-                else if (b < 0)
-                    b = 0;
-
-                bmp.setPixel(x, y, Color.argb(a, r, g, b));
+        for(int i = 0; i < bmp.getWidth() * bmp.getHeight(); i++) {
+            Color.RGBToHSV(Color.red(pixels[i]), Color.green(pixels[i]), Color.blue(pixels[i]), hsvPix);
+            Color.colorToHSV(color, hsvRef);
+            if(distance(hsvRef[0], hsvPix[0]) >= distanceMax){
+                m = grayAverage(pixels[i]);
+                pixels[i] = Color.argb(Color.alpha(pixels[i]), m, m, m);
             }
         }
+
+        bmp.setPixels(pixels, 0, bmp.getWidth(), 0, 0, bmp.getWidth(), bmp.getHeight());
     }
 
-    protected static void contrast(Bitmap bmp, double contrastVal) {
-        int a, r, g, b;
-        int pixel;
+    /**
+     * @param bmp input bitmap
+     * @param r 0 to delete the red channel, 1 to keep it
+     * @param g 0 to delete the red channel, 1 to keep it
+     * @param b 0 to delete the red channel, 1 to keep it
+     */
 
-        double contrast = Math.pow((100 + contrastVal) / 100, 2);
+    protected static void canal(Bitmap bmp, int r, int g, int b){
+        int pixels[] = new int[bmp.getWidth() * bmp.getHeight()];
+        bmp.getPixels(pixels, 0, bmp.getWidth(), 0, 0, bmp.getWidth(), bmp.getHeight());
 
-        for (int x = 0; x < bmp.getWidth(); x++) {
-            for (int y = 0; y < bmp.getHeight(); y++) {
-                pixel = bmp.getPixel(x, y);
-                a = Color.alpha(pixel);
-
-                r = Color.red(pixel);
-                r = (int)(((((r / 255.0) - 0.5) * contrast) + 0.5) * 255.0);
-                if (r > 255)
-                    r = 255;
-                else if (r < 0)
-                    r = 0;
-
-                g = Color.green(pixel);
-                g = (int)(((((g / 255.0) - 0.5) * contrast) + 0.5) * 255.0);
-                if (g > 255)
-                    g = 255;
-                else if (g < 0)
-                    g = 0;
-
-                b = Color.blue(pixel);
-                b = (int)(((((b / 255.0) - 0.5) * contrast) + 0.5) * 255.0);
-                if (b > 255)
-                    b = 255;
-                else if (b < 0)
-                    b = 0;
-
-                bmp.setPixel(x, y, Color.argb(a, r, g, b));
+        for(int i = 0; i < bmp.getWidth() * bmp.getHeight(); i++){
+             pixels[i] = Color.argb(Color.alpha(pixels[i]), r*Color.red(pixels[i]), g*Color.green(pixels[i]), b*Color.blue(pixels[i]));
             }
-        }
+
+        bmp.setPixels(pixels, 0, bmp.getWidth(), 0, 0, bmp.getWidth(), bmp.getHeight());
     }
 
+    /**
+     * @param bmp input bitmap
+     * @param contrast 0..10 1 is default
+     * @param brightness -255..255 0 is default
+     * @param saturation -255...255 1 is default
+     */
+
+    public static void adjust(Bitmap bmp, float brightness, float contrast, float saturation){
+        float t = (-.5f * contrast + .5f) * 255.f;
+
+        ColorMatrix cm = new ColorMatrix(new float[]
+                {
+                        contrast, 0, 0, 0, t+brightness,
+                        0, contrast, 0, 0, t+brightness,
+                        0, 0, contrast, 0, t+brightness,
+                        0, 0, 0, 1, 0,
+                });
+
+        if(saturation != 1)
+            cm.setSaturation(saturation);
+
+        Canvas canvas = new Canvas(bmp);
+        Paint paint = new Paint();
+        paint.setColorFilter(new ColorMatrixColorFilter(cm));
+        canvas.drawBitmap(bmp, 0, 0, paint);
+    }
 
     protected static void histogramEqualization(Bitmap bmp) {
 
-        int p;
-        int alpha;
-        int red;
-        int green;
-        int blue;
+        int a, r, g, b;
 
-        int[] rLUT = histogramLUTRed(bmp);
-        int[] gLUT = histogramLUTGreen(bmp);
-        int[] bLUT = histogramLUTBlue(bmp);
+        int rLUT[] = histogramLUT(bmp, "red");
+        int[] gLUT = histogramLUT(bmp, "green");
+        int[] bLUT = histogramLUT(bmp, "blue");
 
+        int pixels[] = new int[bmp.getWidth() * bmp.getHeight()];
+        bmp.getPixels(pixels, 0, bmp.getWidth(), 0, 0, bmp.getWidth(), bmp.getHeight());
 
-        for(int j = 0; j < bmp.getHeight(); j++)
-            for(int i = 0; i < bmp.getWidth(); i++){
-                p = bmp.getPixel(i,j);
-                alpha = Color.alpha(p);
-                red = Color.red(p);
-                green = Color.green(p);
-                blue = Color.blue(p);
+        for(int i = 0; i < bmp.getWidth() * bmp.getHeight(); i++) {
+            a = Color.alpha(pixels[i]);
+            r = Color.red(pixels[i]);
+            g = Color.green(pixels[i]);
+            b = Color.blue(pixels[i]);
 
-                red = rLUT[red];
-                green = gLUT[green];
-                blue = bLUT[blue];
+            r = rLUT[r];
+            g = gLUT[g];
+            b = bLUT[b];
 
-                bmp.setPixel(i, j, Color.argb(alpha, red, green, blue));
+            pixels[i] = Color.argb(a, r, g, b);
+        }
 
-            }
-
+        bmp.setPixels(pixels, 0, bmp.getWidth(), 0, 0, bmp.getWidth(), bmp.getHeight());
     }
 
-    //Utils
-    protected static int[] calculHistogramRed(Bitmap bmp) {
+    /**
+     * @param bmp input bitmap
+     * @param color "red", "green" or "blue" histogram
+     */
+
+    private static int[] calculHistogram(Bitmap bmp, String color) {
         int h[] = new int[256];
         for (int v = 0; v < 256; v++) {
             h[v] = 0;
         }
-        for (int j = 0; j < bmp.getHeight(); j++) {
-            for (int i = 0; i < bmp.getWidth(); i++) {
-                int p = bmp.getPixel(i, j);
-                int m = Color.red(p);
-                h[m]++;
+
+        int pixels[] = new int[bmp.getWidth() * bmp.getHeight()];
+        bmp.getPixels(pixels, 0, bmp.getWidth(), 0, 0, bmp.getWidth(), bmp.getHeight());
+
+        for(int i = 0; i < bmp.getWidth() * bmp.getHeight(); i++) {
+            switch(color){
+                case "red":
+                    h[Color.red(pixels[i])]++;
+                    break;
+                case "green":
+                    h[Color.green(pixels[i])]++;
+                    break;
+                case "blue":
+                    h[Color.blue(pixels[i])]++;
             }
         }
+
         return h;
     }
 
-    protected static int[] calculHistogramGreen(Bitmap bmp) {
-        int h[] = new int[256];
-        for (int v = 0; v < 256; v++) {
-            h[v] = 0;
-        }
-        for (int j = 0; j < bmp.getHeight(); j++) {
-            for (int i = 0; i < bmp.getWidth(); i++) {
-                int p = bmp.getPixel(i, j);
-                int m = Color.green(p);
-                h[m]++;
-            }
-        }
-        return h;
-    }
+    /**
+     * @param bmp input bitmap
+     * @param color  "red", "green" or "blue" LUT
+     */
 
-    protected static int[] calculHistogramBlue(Bitmap bmp) {
-        int h[] = new int[256];
-        for (int v = 0; v < 256; v++) {
-            h[v] = 0;
-        }
-        for (int j = 0; j < bmp.getHeight(); j++) {
-            for (int i = 0; i < bmp.getWidth(); i++) {
-                int p = bmp.getPixel(i, j);
-                int m = Color.blue(p);
-                h[m]++;
-            }
-        }
-        return h;
-    }
+    private static int[] histogramLUT(Bitmap bmp, String color){
 
-    private static int[] histogramLUTRed(Bitmap bmp){
+        int histogram[] = calculHistogram(bmp, color);
 
-        int[] rhistogram = calculHistogramRed(bmp);
+        int LUT[] = new int[256];
 
-        int[] rLUT = new int[256];
-
-        for(int i = 0; i < rLUT.length; i++)
-            rLUT[i] = 0;
+        for(int i = 0; i < LUT.length; i++)
+            LUT[i] = 0;
 
         long sumr = 0;
+        int valr;
 
         float scale_factor = (float) (255.0 / (bmp.getWidth() * bmp.getHeight()));
 
-        for(int i=0; i<rLUT.length; i++) {
-            sumr += rhistogram[i];
-            int valr = (int) (sumr * scale_factor);
+        for(int i=0; i<LUT.length; i++) {
+            sumr += histogram[i];
+            valr = (int) (sumr * scale_factor);
             if(valr > 255) {
-                rLUT[i] = 255;
+                LUT[i] = 255;
             }
-            else rLUT[i] = valr;
+            else LUT[i] = valr;
 
         }
 
-        return rLUT;
+        return LUT;
     }
-
-    private static int[] histogramLUTGreen(Bitmap bmp){
-
-        int[] ghistogram = calculHistogramGreen(bmp);
-
-        int[] gLUT = new int[256];
-
-        for(int i = 0; i < gLUT.length; i++)
-            gLUT[i] = 0;
-
-        long sumg = 0;
-
-        float scale_factor = (float) (255.0 / (bmp.getWidth() * bmp.getHeight()));
-
-        for(int i=0; i<gLUT.length; i++) {
-            sumg += ghistogram[i];
-            int valg = (int) (sumg * scale_factor);
-            if(valg > 255) {
-                gLUT[i] = 255;
-            }
-            else gLUT[i] = valg;
-
-        }
-
-        return gLUT;
-    }
-
-    private static int[] histogramLUTBlue(Bitmap bmp){
-
-        int[] bhistogram = calculHistogramBlue(bmp);
-
-        int[] bLUT = new int[256];
-
-        for(int i = 0; i < bLUT.length; i++)
-            bLUT[i] = 0;
-
-        long sumb = 0;
-
-        float scale_factor = (float) (255.0 / (bmp.getWidth() * bmp.getHeight()));
-
-        for(int i=0; i<bLUT.length; i++) {
-            sumb += bhistogram[i];
-            int valg = (int) (sumb * scale_factor);
-            if(valg > 255) {
-                bLUT[i] = 255;
-            }
-            else bLUT[i] = valg;
-
-        }
-
-        return bLUT;
-    }
-
-    protected static void convolution(Bitmap bmp){
-        Bitmap bmpCopy = bmp.copy(bmp.getConfig(), true);
-        int[] kernel = new int[9];
-        for(int i = 1; i < bmpCopy.getHeight()-1; i++){
-            for(int j = 1; j < bmpCopy.getWidth()-1; j++){
-                kernel[0] = bmpCopy.getPixel(i-1, j-1);
-                kernel[1] = bmpCopy.getPixel(i-1, j);
-                kernel[2] = bmpCopy.getPixel(i-1, j+1);
-                kernel[3] = bmpCopy.getPixel(i, j-1);
-                kernel[4] = bmpCopy.getPixel(i,j);
-                kernel[5] = bmpCopy.getPixel(i, j+1);
-                kernel[6] = bmpCopy.getPixel(i+1, j-1);
-                kernel[7] = bmpCopy.getPixel(i+1, j);
-                kernel[8] = bmpCopy.getPixel(i+1, j+1);
-                bmp.setPixel(i, j, gauss(kernel));
-            }
-        }
-    }
-
-    protected static int gauss(int[] kernel){
-        return (1/16)*kernel[0]+(2/16)*kernel[1]+(1/16)*kernel[2]+(2/16)*kernel[3]+(4/16)*kernel[4]+(2/16)*kernel[5]+(1/16)*kernel[6]+(2/16)*kernel[7]+(1/16)*kernel[1];
-    }
-
 }
 
