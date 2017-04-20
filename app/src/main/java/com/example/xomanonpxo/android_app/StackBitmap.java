@@ -9,24 +9,28 @@ import android.graphics.Bitmap;
 
 public class StackBitmap {
 
-    //Données membres d'objet
+    //Data
     private static int _size = 2;
     private int _top;
     private Bitmap[] _stack;
 
-    //Constructeur
+    //Constructor
     public StackBitmap(Bitmap[] stack){
         while(stack.length > _size)
             _size *= 2;
         _stack = new Bitmap[_size];
         for(int i = 0; i < stack.length; ++i)
-            _stack[i] = stack[i];
+            _stack[i] = stack[i].copy(stack[i].getConfig(), true);
         _top = stack.length - 1;
     }
 
-    //Accesseurs
+    //Accessors
     public Bitmap getTop(){
         return _stack[_top];
+    }
+
+    public int getNumTop(){
+        return _top;
     }
 
     public void setTop(Bitmap bmp){
@@ -38,7 +42,7 @@ public class StackBitmap {
         return _size;
     }
 
-    //Méthodes de la forme canonique
+    //Canonical form
     public StackBitmap clone(){
         Bitmap[] tmp = new Bitmap[_top+1];
         for(int i = 0; i < tmp.length; ++i)
@@ -65,18 +69,25 @@ public class StackBitmap {
         return true;
     }
 
-    //Méthodes
+    //Methods
     public void push(Bitmap bmp){
         resizeArray();
         _top += 1;
-        _stack[_top] = bmp;
+        _stack[_top] = bmp.copy(bmp.getConfig(), true);
     }
 
     public void pop(){
         if(_top < 0)
             throw new ArrayIndexOutOfBoundsException();
-        _stack[_top] = null;
+        //_stack[_top] = null;
         _top -= 1;
+    }
+
+    public void popAllExceptFirst(){
+        while(_top > 0){
+            pop();
+        }
+        _top = 0;
     }
 
     public boolean isEmpty(){

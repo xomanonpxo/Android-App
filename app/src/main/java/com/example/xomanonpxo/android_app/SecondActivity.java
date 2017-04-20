@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.Environment;
@@ -52,8 +53,8 @@ public class SecondActivity extends AppCompatActivity {
     ImageView imageView;
     PhotoViewAttacher mAttacher;
 
-    Bitmap bmp;
-    Bitmap bmpMod;
+    Bitmap bmp, bmpTmp;
+    StackBitmap stack;
 
     String imagePath = Environment.getExternalStorageDirectory() + "/Android-Filters-App/" + File.separator + Long.toString(System.currentTimeMillis()) + ".png";
 
@@ -72,6 +73,12 @@ public class SecondActivity extends AppCompatActivity {
 
     }
 
+    //Create directory of the app
+    private void createDir(){
+        File sdStorageDir = new File(Environment.getExternalStorageDirectory() + "/Android-Filters-App/");
+        sdStorageDir.mkdirs();
+    }
+
     //Given the choice, start the good intent
     private void selectImage(){
         Intent intent = getIntent();
@@ -83,11 +90,6 @@ public class SecondActivity extends AppCompatActivity {
         if(choice == 1){
             galleryIntent();
         }
-    }
-
-    private void createDir(){
-        File sdStorageDir = new File(Environment.getExternalStorageDirectory() + "/Android-Filters-App/");
-        sdStorageDir.mkdirs();
     }
 
     //Start the camera
@@ -132,8 +134,10 @@ public class SecondActivity extends AppCompatActivity {
     //Show image picked from the camera
     private void onCaptureImageResult(Intent data) {
         bmp = BitmapFactory.decodeFile(imagePath);
-        bmpMod = bmp.copy(bmp.getConfig(), true);
-        imageView.setImageBitmap(bmpMod);
+        bmpTmp = bmp.copy(bmp.getConfig(), true);
+        Bitmap[] stackOrig = new Bitmap[]{bmp};
+        stack = new StackBitmap(stackOrig);
+        imageView.setImageBitmap(stack.getTop());
         mAttacher.update();
     }
 
@@ -147,8 +151,10 @@ public class SecondActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
-        bmpMod = bmp.copy(bmp.getConfig(), true);
-        imageView.setImageBitmap(bmpMod);
+        bmpTmp = bmp.copy(bmp.getConfig(), true);
+        Bitmap[] stackOrig = new Bitmap[]{bmp};
+        stack = new StackBitmap(stackOrig);
+        imageView.setImageBitmap(stack.getTop());
         mAttacher.update();
     }
 
@@ -164,16 +170,24 @@ public class SecondActivity extends AppCompatActivity {
                 builder.setItems(items, new DialogInterface.OnClickListener(){
                     public void onClick(DialogInterface dialog, int item){
                         if(items[item].equals("Luminosity")){
-                            Filters.adjust(bmpMod, 20, 1, 1);
+                            stack.push(stack.getTop());
+                            Filters.adjust(stack.getTop(), 20, 1, 1);
+                            imageView.setImageBitmap(stack.getTop());
                         }
                         else if(items[item].equals("Contrast")){
-                            Filters.adjust(bmpMod, 0, 1.5f, 1);
+                            stack.push(stack.getTop());
+                            Filters.adjust(stack.getTop(), 0, 1.5f, 1);
+                            imageView.setImageBitmap(stack.getTop());
                         }
                         else if(items[item].equals("Saturation")){
-                            Filters.adjust(bmpMod, 0, 1, 1.5f);
+                            stack.push(stack.getTop());
+                            Filters.adjust(stack.getTop(), 0, 1, 1.5f);
+                            imageView.setImageBitmap(stack.getTop());
                         }
                         else if(items[item].equals("Histogram Equalization")){
-                            Filters.histogramEqualization(bmpMod);
+                            stack.push(stack.getTop());
+                            Filters.histogramEqualization(stack.getTop());
+                            imageView.setImageBitmap(stack.getTop());
                         }
                         else if(items[item].equals("Hue")){
                             ColorPicker colorPicker = new ColorPicker(SecondActivity.this);
@@ -181,7 +195,9 @@ public class SecondActivity extends AppCompatActivity {
                             colorPicker.setOnChooseColorListener(new ColorPicker.OnChooseColorListener() {
                                 @Override
                                 public void onChooseColor(int position, int color) {
-                                    Filters.colorize(bmpMod, color);
+                                    stack.push(stack.getTop());
+                                    Filters.colorize(stack.getTop(), color);
+                                    imageView.setImageBitmap(stack.getTop());
                                 }
                                 @Override
                                 public void onCancel() {
@@ -197,16 +213,20 @@ public class SecondActivity extends AppCompatActivity {
         Button effectsButton = (Button)findViewById(R.id.effectsButton);
         effectsButton.setOnClickListener(new View.OnClickListener(){
             public void onClick(View view) {
-                final CharSequence[] items = {"Grayscale", "Sepia", "Hue selection", "Invert", "Anaglyph 3D", "Red Canal", "Green Canal", "Blue Canal"};
+                final CharSequence[] items = {"Grayscale", "Sepia", "Hue selection", "Invert", "Anaglyph 3D", "Red Canal", "Green Canal", "Blue Canal", "Pencil sketch"};
                 AlertDialog.Builder builder = new AlertDialog.Builder(SecondActivity.this);
                 builder.setTitle("Select a filter");
                 builder.setItems(items, new DialogInterface.OnClickListener(){
                     public void onClick(DialogInterface dialog, int item){
                         if(items[item].equals("Grayscale")){
-                            Filters.grayscale(bmpMod);
+                            stack.push(stack.getTop());
+                            Filters.grayscale(stack.getTop());
+                            imageView.setImageBitmap(stack.getTop());
                         }
                         else if(items[item].equals("Sepia")){
-                            Filters.sepia(bmpMod);
+                            stack.push(stack.getTop());
+                            Filters.sepia(stack.getTop());
+                            imageView.setImageBitmap(stack.getTop());
                         }
                         else if(items[item].equals("Hue selection")){
                             ColorPicker colorPicker = new ColorPicker(SecondActivity.this);
@@ -214,7 +234,9 @@ public class SecondActivity extends AppCompatActivity {
                             colorPicker.setOnChooseColorListener(new ColorPicker.OnChooseColorListener() {
                                 @Override
                                 public void onChooseColor(int position, int color) {
-                                    Filters.selectHue(bmpMod, color);
+                                    stack.push(stack.getTop());
+                                    Filters.selectHue(stack.getTop(), color);
+                                    imageView.setImageBitmap(stack.getTop());
                                 }
                                 @Override
                                 public void onCancel() {
@@ -222,19 +244,34 @@ public class SecondActivity extends AppCompatActivity {
                             });
                         }
                         else if(items[item].equals("Invert")){
-                            Filters.invert(bmpMod);
+                            stack.push(stack.getTop());
+                            Filters.invert(stack.getTop());
+                            imageView.setImageBitmap(stack.getTop());
                         }
                         else if(items[item].equals("Anaglyph 3D")){
-                            Filters.anaglyph(bmpMod);
+                            stack.push(stack.getTop());
+                            Filters.anaglyph(stack.getTop());
+                            imageView.setImageBitmap(stack.getTop());
                         }
                         else if(items[item].equals("Red Canal")){
-                            Filters.canal(bmpMod, 1, 0, 0);
+                            stack.push(stack.getTop());
+                            Filters.canal(stack.getTop(), 1, 0, 0);
+                            imageView.setImageBitmap(stack.getTop());
                         }
                         else if(items[item].equals("Green Canal")){
-                            Filters.canal(bmpMod, 0, 1, 0);
+                            stack.push(stack.getTop());
+                            Filters.canal(stack.getTop(), 0, 1, 0);
+                            imageView.setImageBitmap(stack.getTop());
                         }
                         else if(items[item].equals("Blue Canal")){
-                            Filters.canal(bmpMod, 0, 0, 1);
+                            stack.push(stack.getTop());
+                            Filters.canal(stack.getTop(), 0, 0, 1);
+                            imageView.setImageBitmap(stack.getTop());
+                        }
+                        else if(items[item].equals("Pencil sketch")){
+                            stack.push(stack.getTop());
+                            Filters.pencilSketch(stack.getTop());
+                            imageView.setImageBitmap(stack.getTop());
                         }
                     }
                 });
@@ -245,71 +282,47 @@ public class SecondActivity extends AppCompatActivity {
         final Button convolution = (Button)findViewById(R.id.convolutionButton);
         convolution.setOnClickListener(new View.OnClickListener(){
             public void onClick(View view) {
-                final CharSequence[] items = {"Average", "Gaussian", "Sobel", "Laplacien"};
+                final CharSequence[] items = {"Average", "Gaussian", "Sobel", "Laplacian"};
                 AlertDialog.Builder builder = new AlertDialog.Builder(SecondActivity.this);
                 builder.setTitle("Select a convolution");
                 builder.setItems(items, new DialogInterface.OnClickListener(){
                     public void onClick(DialogInterface dialog, int item){
                         if(items[item].equals("Average")){
-                            double AverageConfig[][] = new double[][] {
-                                    { 1, 1, 1, 1, 1 },
-                                    { 1, 1, 1, 1, 1 },
-                                    { 1, 1, 1, 1, 1 },
-                                    { 1, 1, 1, 1, 1 },
-                                    { 1, 1, 1, 1, 1 }
-                            };
-                            ConvolMatrix averageMatrix = new ConvolMatrix(AverageConfig);
-                            ConvolMatrix.applyConvolution(bmpMod, averageMatrix);
+                            stack.push(stack.getTop());
+                            ConvolMatrix averageMatrix = new ConvolMatrix(Filters.matrixConfig("average"));
+                            ConvolMatrix.applyConvolution(stack.getTop(), averageMatrix);
+                            imageView.setImageBitmap(stack.getTop());
                         }
                         else if(items[item].equals("Gaussian")){
-                            double GaussianConfig[][] = new double[][] {
-                                    { 1, 2, 3, 2, 1 },
-                                    { 2, 6, 8, 6, 2 },
-                                    { 3, 8, 10, 8, 3 },
-                                    { 2, 6, 8, 6, 2 },
-                                    { 1, 2, 3, 2, 1 }
-                            };
-                            ConvolMatrix gaussMatrix = new ConvolMatrix(GaussianConfig);
-                            ConvolMatrix.applyConvolution(bmpMod, gaussMatrix);
+                            stack.push(stack.getTop());
+                            ConvolMatrix gaussMatrix = new ConvolMatrix(Filters.matrixConfig("gaussian"));
+                            ConvolMatrix.applyConvolution(stack.getTop(), gaussMatrix);
+                            imageView.setImageBitmap(stack.getTop());
                         }
                         else if(items[item].equals("Sobel")){
                             Bitmap bmpCopy1 = bmp.copy(bmp.getConfig(), true);
-                            double sobelVerticalConfig[][] = new double[][] {
-                                    { 1, 2, 1 },
-                                    { 0, 0, 0 },
-                                    { -1, -2, -1 }
-                            };
-                            ConvolMatrix sobelVerticalMatrix = new ConvolMatrix(sobelVerticalConfig);
+                            ConvolMatrix sobelVerticalMatrix = new ConvolMatrix(Filters.matrixConfig("sobelVertical"), 8);
                             ConvolMatrix.applyConvolution(bmpCopy1, sobelVerticalMatrix);
                             Bitmap bmpCopy2 = bmp.copy(bmp.getConfig(), true);
-                            double sobelHorizontalConfig[][] = new double[][] {
-                                    { -1, 0, 1 },
-                                    { -2, 0, 2 },
-                                    { -1, 0, 1 }
-                            };
-                            ConvolMatrix sobelHorizontalMatrix = new ConvolMatrix(sobelHorizontalConfig);
+                            ConvolMatrix sobelHorizontalMatrix = new ConvolMatrix(Filters.matrixConfig("sobelHorizontal"), 8);
                             ConvolMatrix.applyConvolution(bmpCopy2, sobelHorizontalMatrix);
-                            int p1, p2;
-                            for(int i = 0; i < bmpMod.getWidth(); ++i){
-                                for(int j = 0; j < bmpMod.getHeight(); ++j){
+                            int p1, p2, value;
+                            stack.push(stack.getTop());
+                            for(int i = 0; i < stack.getTop().getWidth() - 1; ++i){
+                                for(int j = 0; j < stack.getTop().getHeight() -1; ++j){
                                     p1 = bmpCopy1.getPixel(i, j);
                                     p2 = bmpCopy2.getPixel(i, j);
-
-                                    bmpMod.setPixel(i, j, (int)Math.sqrt(p1*p1+p2*p2));
+                                    value = Filters.grayAverage((int)Math.sqrt(p1*p1+p2*p2));
+                                    stack.getTop().setPixel(i, j, Color.rgb(value, value, value));
                                 }
                             }
-                            Toast.makeText(getApplicationContext(), Double.toString(sobelHorizontalMatrix.getFactor()), Toast.LENGTH_SHORT).show();
+                            imageView.setImageBitmap(stack.getTop());
                         }
-                        else if(items[item].equals("Laplacien")) {
-                            double laplacienConfig[][] = new double[][] {
-                                    { 1, 1, 1 },
-                                    { 1, -8, 1 },
-                                    { 1, 1, 1 }
-                            };
-                            ConvolMatrix laplacienMatrix = new ConvolMatrix(laplacienConfig);
-                            ConvolMatrix.applyConvolution(bmpMod, laplacienMatrix);
-
-                            Toast.makeText(getApplicationContext(), "Laplacien to be done !", Toast.LENGTH_SHORT).show();
+                        else if(items[item].equals("Laplacian")) {
+                            stack.push(stack.getTop());
+                            ConvolMatrix laplacienMatrix = new ConvolMatrix(Filters.matrixConfig("laplacian"));
+                            ConvolMatrix.applyConvolution(stack.getTop(), laplacienMatrix);
+                            imageView.setImageBitmap(stack.getTop());
                         }
                     }
                 });
@@ -317,19 +330,31 @@ public class SecondActivity extends AppCompatActivity {
             }
         });
 
+        Button undoButton = (Button)findViewById(R.id.undo);
+        undoButton.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View view) {
+                if(stack.getNumTop() <= 0)
+                    Toast.makeText(getApplicationContext(), "No modifications to undo !", Toast.LENGTH_SHORT).show();
+                else{
+                    stack.pop();
+                    imageView.setImageBitmap(stack.getTop());
+                }
+
+            }
+        });
+
         Button resetButton = (Button)findViewById(R.id.resetButton);
         resetButton.setOnClickListener(new View.OnClickListener(){
             public void onClick(View view) {
-                bmpMod = bmp.copy(bmp.getConfig(), true);
-                imageView.setImageBitmap(bmpMod);
-                mAttacher.update();
+                stack.popAllExceptFirst();
+                imageView.setImageBitmap(stack.getTop());
             }
         });
 
         Button savePicButton = (Button)findViewById(R.id.savePicButton);
         savePicButton.setOnClickListener(new View.OnClickListener(){
             public void onClick(View view) {
-                boolean stored = storeImage(bmpMod);
+                boolean stored = storeImage(stack.getTop());
                 Intent i = getBaseContext().getPackageManager().getLaunchIntentForPackage(getBaseContext().getPackageName() );
                 i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(i);
