@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="utf-8"?>
+<items version="2" >
+
+    <item
+        is-multidex="false"
+        jar="/home/xomanonpxo/Android-App/app/build/intermediates/exploded-aar/com.android.support/support-v4/24.2.1/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.2"
+        sha1="d7c42c80f6509b9ea4db28ca7859ffae08ec5741">
+        <dex dex="/home/xomanonpxo/Android-App/app/build/intermediates/pre-dexed/debug/com.android.support-support-v4-24.2.1_8dfdbc5acab42f50366c8a2282c00cbda397d72d.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/home/xomanonpxo/Android/Sdk/extras/android/m2repository/com/android/support/support-annotations/24.2.1/support-annotations-24.2.1.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.2"
+        sha1="8de3aafecbdf98a61db6427f008f2d515bcd2544">
+        <dex dex="/home/xomanonpxo/Android-App/app/build/intermediates/pre-dexed/debug/support-annotations-24.2.1_81a0481242867744c519a58102b11a402a887f58.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/home/xomanonpxo/Android-App/app/build/intermediates/exploded-aar/com.android.support/support-fragment/24.2.1/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.2"
+        sha1="b9a1ac78ad7ef3abedc4a4b30cd92bcacb939d1f">
+        <dex dex="/home/xomanonpxo/Android-App/app/build/intermediates/pre-dexed/debug/com.android.support-support-fragment-24.2.1_4566d8bf8b015d79b0fd0e848be39fd4aea39673.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/home/xomanonpxo/Android-App/app/build/intermediates/exploded-aar/com.android.support/support-core-ui/24.2.1/jars/libs/internal_impl-24.2.1.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.2"
+        sha1="867dad63c33388ff8c7644b236579355036d075f">
+        <dex dex="/home/xomanonpxo/Android-App/app/build/intermediates/pre-dexed/debug/internal_impl-24.2.1_0c9ba3e2bfc0c6de36bd922d00a40d85d697ede4.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/home/xomanonpxo/Android-App/app/build/intermediates/exploded-aar/com.android.support/support-core-ui/24.2.1/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.2"
+        sha1="e7f3132168957eefc46229fc32c3bd464642b71e">
+        <dex dex="/home/xomanonpxo/Android-App/app/build/intermediates/pre-dexed/debug/com.android.support-support-core-ui-24.2.1_81a948689026f195ee0cee7824bfff3312285eff.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/home/xomanonpxo/Android-App/app/build/intermediates/exploded-aar/com.android.support/support-compat/24.2.1/jars/libs/internal_impl-24.2.1.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.2"
+        sha1="7e4389bd133359a2ff88623ff1e4ff93d6e6f780">
+        <dex dex="/home/xomanonpxo/Android-App/app/build/intermediates/pre-dexed/debug/internal_impl-24.2.1_ec6bdb938fa7edb0a22ce28acf20f44dd9a00923.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/home/xomanonpxo/Android-App/app/build/intermediates/exploded-aar/com.android.support/support-vector-drawable/24.2.1/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.2"
+        sha1="d5c731fc64c03dfe04d51134955b483551c35849">
+        <dex dex="/home/xomanonpxo/Android-App/app/build/intermediates/pre-dexed/debug/com.android.support-support-vector-drawable-24.2.1_7e600bc72a722f05b40ad97f72358b2e13efb8f8.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/home/xomanonpxo/Android-App/app/build/intermediates/exploded-aar/com.android.support/support-compat/24.2.1/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.2"
+        sha1="0ecb4b595fa0f0f8018a149ace3ea6525624f94e">
+        <dex dex="/home/xomanonpxo/Android-App/app/build/intermediates/pre-dexed/debug/com.android.support-support-compat-24.2.1_7ba80051ba198d827b7a4312b0f7e75c6e1016aa.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/home/xomanonpxo/Android-App/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.2.1/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.2"
+        sha1="43b2dba6b5a0b14527961b75329d0b90025f15ea">
+        <dex dex="/home/xomanonpxo/Android-App/app/build/intermediates/pre-dexed/debug/com.android.support-appcompat-v7-24.2.1_96ebc41cf837158ca13fba1921b3a365cc1778eb.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/home/xomanonpxo/Android-App/app/build/intermediates/exploded-aar/com.github.chrisbanes.photoview/library/1.2.3/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.2"
+        sha1="81aa0e8e77d948204aa6754019c6f3c04dd922e3">
+        <dex dex="/home/xomanonpxo/Android-App/app/build/intermediates/pre-dexed/debug/com.github.chrisbanes.photoview-library-1.2.3_f0712d6f18fd55af0cc656cc19dec7853339bd02.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/home/xomanonpxo/Android-App/app/build/intermediates/exploded-aar/petrov.kristiyan.colorpicker/colorpicker-library/1.1.2/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.2"
+        sha1="1b52dc34011d1b703f6534b3f2ab2200b6071f5f">
+        <dex dex="/home/xomanonpxo/Android-App/app/build/intermediates/pre-dexed/debug/petrov.kristiyan.colorpicker-colorpicker-library-1.1.2_2fcf8675bcb16e0dd6953fd2dc03f840b3437b4c.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/home/xomanonpxo/Android-App/app/build/intermediates/exploded-aar/com.github.yukuku/ambilwarna/2.0.1/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.2"
+        sha1="7ed87c7f833e46dacace668e63cb8c4b67cb3172">
+        <dex dex="/home/xomanonpxo/Android-App/app/build/intermediates/pre-dexed/debug/com.github.yukuku-ambilwarna-2.0.1_3c2ad957c569a915006b66000af4b5c72f42e1f2.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/home/xomanonpxo/Android-App/app/build/intermediates/exploded-aar/com.android.support/support-media-compat/24.2.1/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.2"
+        sha1="09b462bbcb77650284bd6614f1a32f360ef369f8">
+        <dex dex="/home/xomanonpxo/Android-App/app/build/intermediates/pre-dexed/debug/com.android.support-support-media-compat-24.2.1_8b671915a6b61f6e5f69e0d7298b9edb9d9289cf.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/home/xomanonpxo/Android-App/app/build/intermediates/exploded-aar/com.android.support/recyclerview-v7/24.2.1/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.2"
+        sha1="7521486d9bfd2cd9e756e0cf75ed7d97f2ce2d3b">
+        <dex dex="/home/xomanonpxo/Android-App/app/build/intermediates/pre-dexed/debug/com.android.support-recyclerview-v7-24.2.1_11704334ff289637468ec2ec740779e828d5c893.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/home/xomanonpxo/Android-App/app/build/intermediates/exploded-aar/com.android.support/animated-vector-drawable/24.2.1/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.2"
+        sha1="94bc1dfb84dcc8b6f6f8f7cc726d7b2dd39c1574">
+        <dex dex="/home/xomanonpxo/Android-App/app/build/intermediates/pre-dexed/debug/com.android.support-animated-vector-drawable-24.2.1_cda24e39dc8661b04739453ef7871497acf82a69.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/home/xomanonpxo/Android-App/app/build/intermediates/exploded-aar/com.android.support/support-core-utils/24.2.1/jars/libs/internal_impl-24.2.1.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.2"
+        sha1="935a969265b2a166b2d20415423f5f6e90fe16e0">
+        <dex dex="/home/xomanonpxo/Android-App/app/build/intermediates/pre-dexed/debug/internal_impl-24.2.1_c89fbe08dc9c2e63dfdc86b89b8e3fbcbf231a70.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/home/xomanonpxo/Android-App/app/build/intermediates/exploded-aar/com.android.support/support-media-compat/24.2.1/jars/libs/internal_impl-24.2.1.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.2"
+        sha1="fbf8da429efd5ad21e02e3e5ecaa1efc4167878d">
+        <dex dex="/home/xomanonpxo/Android-App/app/build/intermediates/pre-dexed/debug/internal_impl-24.2.1_c717c796a6ce6f6fab3ab47017028602aced6327.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/home/xomanonpxo/Android-App/app/build/intermediates/exploded-aar/com.android.support/support-fragment/24.2.1/jars/libs/internal_impl-24.2.1.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.2"
+        sha1="5f64d657e838e8375135c0f6057a7ff8fab6a50e">
+        <dex dex="/home/xomanonpxo/Android-App/app/build/intermediates/pre-dexed/debug/internal_impl-24.2.1_c2407a97ab6f5d336999ffd2a64c21cc564d124a.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/home/xomanonpxo/Android-App/app/build/intermediates/exploded-aar/com.android.support/support-core-utils/24.2.1/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.2"
+        sha1="9c4c3bc902450c39ed54de170db4fb12aea20a35">
+        <dex dex="/home/xomanonpxo/Android-App/app/build/intermediates/pre-dexed/debug/com.android.support-support-core-utils-24.2.1_242fe2e6f888442fa28f1dfc685add28ca37e55e.jar" />
+    </item>
+
+</items>
