@@ -16,6 +16,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
@@ -164,24 +165,39 @@ public class SecondActivity extends AppCompatActivity {
         Button adjustButton = (Button)findViewById(R.id.adjustButton);
         adjustButton.setOnClickListener(new View.OnClickListener(){
             public void onClick(View view) {
-                final CharSequence[] items = {"Luminosity", "Contrast", "Saturation", "Histogram Equalization", "Hue"};
+                final CharSequence[] items = {"+ Luminosity", "- Luminosity", "+ Contrast", "- Contrast", "+ Saturation", "- Saturation", "Histogram Equalization", "Hue"};
                 AlertDialog.Builder builder = new AlertDialog.Builder(SecondActivity.this);
                 builder.setTitle("Select an adjustment");
                 builder.setItems(items, new DialogInterface.OnClickListener(){
                     public void onClick(DialogInterface dialog, int item){
-                        if(items[item].equals("Luminosity")){
+                        if(items[item].equals("+ Luminosity")){
                             stack.push(stack.getTop());
                             Filters.adjust(stack.getTop(), 20, 1, 1);
                             imageView.setImageBitmap(stack.getTop());
                         }
-                        else if(items[item].equals("Contrast")){
+                        else if(items[item].equals("- Luminosity")){
+                            stack.push(stack.getTop());
+                            Filters.adjust(stack.getTop(), -20, 1, 1);
+                            imageView.setImageBitmap(stack.getTop());
+                        }
+                        else if(items[item].equals("+ Contrast")){
                             stack.push(stack.getTop());
                             Filters.adjust(stack.getTop(), 0, 1.5f, 1);
                             imageView.setImageBitmap(stack.getTop());
                         }
-                        else if(items[item].equals("Saturation")){
+                        else if(items[item].equals("- Contrast")){
+                            stack.push(stack.getTop());
+                            Filters.adjust(stack.getTop(), 0, 0.5f, 1);
+                            imageView.setImageBitmap(stack.getTop());
+                        }
+                        else if(items[item].equals("+ Saturation")){
                             stack.push(stack.getTop());
                             Filters.adjust(stack.getTop(), 0, 1, 1.5f);
+                            imageView.setImageBitmap(stack.getTop());
+                        }
+                        else if(items[item].equals("- Saturation")){
+                            stack.push(stack.getTop());
+                            Filters.adjust(stack.getTop(), 0, 1, 0.5f);
                             imageView.setImageBitmap(stack.getTop());
                         }
                         else if(items[item].equals("Histogram Equalization")){
@@ -455,22 +471,4 @@ Filters.change(bmpMod, 20, 1, 1);
                     }
                 });
                 popDialog.show();
-Filters.change(bmpMod, 0, 1.5f, 1);
-        }
-        });
-
-        Button saturationButton = (Button)findViewById(R.id.saturationButton);
-        saturationButton.setOnClickListener(new View.OnClickListener(){
-public void onClick(View view) {
-        Filters.change(bmpMod, 0, 1, 1.5f);
-        }
-        });
-
-        Button histogramEqButton = (Button)findViewById(R.id.histogramEqButton);
-        histogramEqButton.setOnClickListener(new View.OnClickListener(){
-public void onClick(View view) {
-        Filters.histogramEqualization(bmpMod);
-        }
-        });
-
- */
+*/
