@@ -1,6 +1,8 @@
 package com.example.xomanonpxo.android_app;
 
+import android.app.backup.RestoreObserver;
 import android.graphics.Bitmap;
+import android.graphics.BlurMaskFilter;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.ColorMatrix;
@@ -13,7 +15,7 @@ import android.graphics.Paint;
 
 public class Filters {
 
-    private static int grayAverage(int color){
+    public static int grayAverage(int color){
         return (int) (0.3 * Color.red(color) + 0.59 * Color.green(color) + 0.11 * Color.blue(color));
     }
 
@@ -270,6 +272,95 @@ public class Filters {
         }
 
         return LUT;
+    }
+
+    public static double[][] matrixConfig(String filter){
+        double[][] matrix = new double[3][3];
+
+        switch(filter){
+            case "average":
+                matrix = new double[][] {
+                        { 1, 1, 1, 1, 1 },
+                        { 1, 1, 1, 1, 1 },
+                        { 1, 1, 1, 1, 1 },
+                        { 1, 1, 1, 1, 1 },
+                        { 1, 1, 1, 1, 1 }
+                };
+                break;
+            case "gaussian":
+                matrix = new double[][] {
+                        { 1, 2, 3, 2, 1 },
+                        { 2, 6, 8, 6, 2 },
+                        { 3, 8, 10, 8, 3 },
+                        { 2, 6, 8, 6, 2 },
+                        { 1, 2, 3, 2, 1 }
+                };
+                break;
+            case "sobelVertical":
+                matrix = new double[][] {
+                        { 1, 2, 1 },
+                        { 0, 0, 0 },
+                        { -1, -2, -1 }
+                };
+                break;
+            case "sobelHorizontal":
+                matrix = new double[][] {
+                        { -1, 0, 1 },
+                        { -2, 0, 2 },
+                        { -1, 0, 1 }
+                };
+                break;
+            case "laplacian":
+                matrix = new double[][] {
+                        { 1, 1, 1 },
+                        { 1, -8, 1 },
+                        { 1, 1, 1 }
+                };
+        }
+
+        return matrix;
+    }
+
+    public static void pencilSketch(Bitmap bmp){
+        grayscale(bmp);
+        Bitmap bmpCopy = bmp.copy(bmp.getConfig(), true);
+        invert(bmpCopy);
+        ConvolMatrix gaussMatrix = new ConvolMatrix(Filters.matrixConfig("gaussian"));
+        ConvolMatrix.applyConvolution(bmpCopy, gaussMatrix);
+
+        int pixelsOrig[] = new int[bmp.getWidth() * bmp.getHeight()];
+        bmp.getPixels(pixelsOrig, 0, bmp.getWidth(), 0, 0, bmp.getWidth(), bmp.getHeight());
+        int pixelsFilter[] = new int[bmp.getWidth() * bmp.getHeight()];
+        bmpCopy.getPixels(pixelsFilter, 0, bmp.getWidth(), 0, 0, bmp.getWidth(), bmp.getHeight());
+
+
+        int rOrig, gOrig, bOrig;
+        int rFilter, gFilter, bFilter;
+        int rFinal, gFinal, bFinal;
+
+        for(int i = 0; i < bmp.getWidth() * bmp.getHeight(); i++) {
+            rOrig = Color.red(pixelsOrig[i]);
+            gOrig = Color.green(pixelsOrig[i]);
+            bOrig = Color.blue(pixelsOrig[i]);
+
+            rFilter = Color.red(pixelsFilter[i]);
+            gFilter = Color.green(pixelsFilter[i]);
+            bFilter = Color.blue(pixelsFilter[i]);
+
+            rFinal = colorDodge(rFilter, rOrig);
+            gFinal = colorDodge(gFilter, bOrig);
+            bFinal = colorDodge(bFilter, gOrig);
+
+            pixelsOrig[i] = Color.argb(255, rFinal, gFinal, bFinal);
+        }
+
+        bmp.setPixels(pixelsOrig, 0, bmp.getWidth(), 0, 0, bmp.getWidth(), bmp.getHeight());
+    }
+
+    private static int colorDodge(int in1, int in2) {
+        float image = (float)in2;
+        float mask = (float)in1;
+        return ((int) ((image == 255) ? image:Math.min(255, (((long)mask << 8 ) / (255 - image)))));
     }
 }
 
